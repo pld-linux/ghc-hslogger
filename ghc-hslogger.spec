@@ -1,4 +1,4 @@
-%define	pkgname	hslogger
+%define		pkgname	hslogger
 Summary:	Versatile logging framework for Haskell
 Name:		ghc-%{pkgname}
 Version:	1.1.0
@@ -7,12 +7,11 @@ License:	LGPL
 Group:		Development/Languages
 Source0:	http://hackage.haskell.org/packages/archive/%{pkgname}/%{version}/%{pkgname}-%{version}.tar.gz
 # Source0-md5:	8039e079338dae19e1273bbd73332014
-URL:		http://hackage.haskell.org/package/%{pkgname}/
+URL:		http://hackage.haskell.org/package/hslogger/
 BuildRequires:	ghc >= 6.12.3
+BuildRequires:	rpmbuild(macros) >= 1.608
 %requires_releq	ghc
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
-
-%define		ghcdir		ghc-%(/usr/bin/ghc --numeric-version)
 
 %description
 hslogger is a logging framework for Haskell, roughly similar to Python's
@@ -54,10 +53,10 @@ runhaskell Setup.hs register \
 rm -rf $RPM_BUILD_ROOT
 
 %post
-/usr/bin/ghc-pkg recache
+%ghc_pkg_recache
 
 %postun
-/usr/bin/ghc-pkg recache
+%ghc_pkg_recache
 
 %files
 %defattr(644,root,root,755)
