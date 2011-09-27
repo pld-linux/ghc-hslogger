@@ -2,15 +2,19 @@
 Summary:	Versatile logging framework for Haskell
 Name:		ghc-%{pkgname}
 Version:	1.1.5
-Release:	1
+Release:	2
 License:	LGPL
 Group:		Development/Languages
 Source0:	http://hackage.haskell.org/packages/archive/%{pkgname}/%{version}/%{pkgname}-%{version}.tar.gz
 # Source0-md5:	cd3dfd6f88176bd53b333ea29130a857
 URL:		http://hackage.haskell.org/package/hslogger/
 BuildRequires:	ghc >= 6.12.3
+BuildRequires:	ghc-mtl
+BuildRequires:	ghc-network
 BuildRequires:	rpmbuild(macros) >= 1.608
 %requires_eq	ghc
+Requires:	ghc-mtl
+Requires:	ghc-network
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 # debuginfo is not useful for ghc
