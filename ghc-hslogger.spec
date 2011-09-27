@@ -1,12 +1,12 @@
 %define		pkgname	hslogger
 Summary:	Versatile logging framework for Haskell
 Name:		ghc-%{pkgname}
-Version:	1.1.0
-Release:	3
+Version:	1.1.5
+Release:	1
 License:	LGPL
 Group:		Development/Languages
 Source0:	http://hackage.haskell.org/packages/archive/%{pkgname}/%{version}/%{pkgname}-%{version}.tar.gz
-# Source0-md5:	8039e079338dae19e1273bbd73332014
+# Source0-md5:	cd3dfd6f88176bd53b333ea29130a857
 URL:		http://hackage.haskell.org/package/hslogger/
 BuildRequires:	ghc >= 6.12.3
 BuildRequires:	rpmbuild(macros) >= 1.608
