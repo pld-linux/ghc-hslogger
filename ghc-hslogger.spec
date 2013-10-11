@@ -1,12 +1,12 @@
 %define		pkgname	hslogger
 Summary:	Versatile logging framework for Haskell
 Name:		ghc-%{pkgname}
-Version:	1.2.1
+Version:	1.2.3
 Release:	1
 License:	LGPL
 Group:		Development/Languages
 Source0:	http://hackage.haskell.org/packages/archive/%{pkgname}/%{version}/%{pkgname}-%{version}.tar.gz
-# Source0-md5:	d94e39cd6a262565cf0758a6ead74919
+# Source0-md5:	4047e50789860c8ac3e8998f7de68ca5
 URL:		http://hackage.haskell.org/package/hslogger/
 BuildRequires:	ghc >= 6.12.3
 BuildRequires:	ghc-mtl
@@ -15,6 +15,7 @@ BuildRequires:	rpmbuild(macros) >= 1.608
 %requires_eq	ghc
 Requires:	ghc-mtl
 Requires:	ghc-network
+Obsoletes:	ghc-hslogger-doc
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 # debuginfo is not useful for ghc
@@ -29,22 +30,25 @@ associated with it. The programmer can then define global handlers
 that route or filter messages based on the priority and source.
 hslogger also has a syslog handler built in.
 
-%package doc
-Summary:	HTML documentation for %{pkgname}
-Summary(pl.UTF-8):	Dokumentacja w formacie HTML dla %{pkgname}
-Group:		Documentation
+%package prof
+Summary:	Profiling %{pkgname} library for GHC
+Summary(pl.UTF-8):	Biblioteka profilująca %{pkgname} dla GHC.
+Group:		Development/Libraries
+Requires:	%{name} = %{version}-%{release}
 
-%description doc
-HTML documentation for %{pkgname}.
+%description prof
+Profiling %{pkgname} library for GHC.  Should be installed when
+GHC's profiling subsystem is needed.
 
-%description doc -l pl.UTF-8
-Dokumentacja w formacie HTML dla %{pkgname}.
+%description prof -l pl.UTF-8
+Biblioteka profilująca %{pkgname} dla GHC. Powinna być zainstalowana
+kiedy potrzebujemy systemu profilującego z GHC.
 
 %prep
 %setup -q -n %{pkgname}-%{version}
 
 %build
-runhaskell Setup.hs configure -v2 \
+runhaskell Setup.hs configure -v2 --enable-library-profiling \
 	--prefix=%{_prefix} \
 	--libdir=%{_libdir} \
 	--libexecdir=%{_libexecdir} \
@@ -78,9 +82,23 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(644,root,root,755)
-%{_libdir}/%{ghcdir}/package.conf.d/%{pkgname}.conf
-%{_libdir}/%{ghcdir}/%{pkgname}-%{version}
-
-%files doc
-%defattr(644,root,root,755)
 %doc %{name}-%{version}-doc/*
+%{_libdir}/%{ghcdir}/package.conf.d/%{pkgname}.conf
+%dir %{_libdir}/%{ghcdir}/%{pkgname}-%{version}
+%{_libdir}/%{ghcdir}/%{pkgname}-%{version}/*.o
+%{_libdir}/%{ghcdir}/%{pkgname}-%{version}/*.a
+%exclude %{_libdir}/%{ghcdir}/%{pkgname}-%{version}/*_p.a
+
+%dir %{_libdir}/%{ghcdir}/%{pkgname}-%{version}/System
+%{_libdir}/%{ghcdir}/%{pkgname}-%{version}/System/*.hi
+%dir %{_libdir}/%{ghcdir}/%{pkgname}-%{version}/System/Log
+%{_libdir}/%{ghcdir}/%{pkgname}-%{version}/System/Log/*.hi
+%dir %{_libdir}/%{ghcdir}/%{pkgname}-%{version}/System/Log/Handler
+%{_libdir}/%{ghcdir}/%{pkgname}-%{version}/System/Log/Handler/*.hi
+
+%files prof
+%defattr(644,root,root,755)
+%{_libdir}/%{ghcdir}/%{pkgname}-%{version}/*_p.a
+%{_libdir}/%{ghcdir}/%{pkgname}-%{version}/System/*.p_hi
+%{_libdir}/%{ghcdir}/%{pkgname}-%{version}/System/Log/*.p_hi
+%{_libdir}/%{ghcdir}/%{pkgname}-%{version}/System/Log/Handler/*.p_hi
