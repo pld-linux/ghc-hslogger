@@ -1,20 +1,33 @@
+#
+# Conditional build:
+%bcond_without	prof	# profiling library
+#
 %define		pkgname	hslogger
 Summary:	Versatile logging framework for Haskell
 Name:		ghc-%{pkgname}
-Version:	1.2.3
+Version:	1.3.1.0
 Release:	1
 License:	LGPL
 Group:		Development/Languages
 Source0:	http://hackage.haskell.org/packages/archive/%{pkgname}/%{version}/%{pkgname}-%{version}.tar.gz
-# Source0-md5:	4047e50789860c8ac3e8998f7de68ca5
+# Source0-md5:	4988eed9369f71dda1fba137f5476d9d
+Patch0:		ghc-8.10.patch
 URL:		http://hackage.haskell.org/package/hslogger/
 BuildRequires:	ghc >= 6.12.3
 BuildRequires:	ghc-mtl
-BuildRequires:	ghc-network
+BuildRequires:	ghc-network >= 2.6
+BuildRequires:	ghc-network-bsd >= 2.8.1
+%if %{with prof}
+BuildRequires:	ghc-prof
+BuildRequires:	ghc-mtl-prof
+BuildRequires:	ghc-network-prof >= 2.6
+BuildRequires:	ghc-network-bsd-prof >= 2.8.1
+%endif
 BuildRequires:	rpmbuild(macros) >= 1.608
 %requires_eq	ghc
 Requires:	ghc-mtl
-Requires:	ghc-network
+Requires:	ghc-network >= 2.6
+Requires:	ghc-network-bsd >= 2.8.1
 Obsoletes:	ghc-hslogger-doc
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -35,6 +48,9 @@ Summary:	Profiling %{pkgname} library for GHC
 Summary(pl.UTF-8):	Biblioteka profilująca %{pkgname} dla GHC.
 Group:		Development/Libraries
 Requires:	%{name} = %{version}-%{release}
+Requires:	ghc-mtl-prof
+Requires:	ghc-network-prof >= 2.6
+Requires:	ghc-network-bsd-prof >= 2.8.1
 
 %description prof
 Profiling %{pkgname} library for GHC.  Should be installed when
@@ -46,9 +62,11 @@ kiedy potrzebujemy systemu profilującego z GHC.
 
 %prep
 %setup -q -n %{pkgname}-%{version}
+%patch0 -p1
 
 %build
-runhaskell Setup.hs configure -v2 --enable-library-profiling \
+runhaskell Setup.hs configure -v2 \
+	%{?with_prof:--enable-library-profiling} \
 	--prefix=%{_prefix} \
 	--libdir=%{_libdir} \
 	--libexecdir=%{_libexecdir} \
@@ -85,20 +103,28 @@ rm -rf $RPM_BUILD_ROOT
 %doc %{name}-%{version}-doc/*
 %{_libdir}/%{ghcdir}/package.conf.d/%{pkgname}.conf
 %dir %{_libdir}/%{ghcdir}/%{pkgname}-%{version}
-%{_libdir}/%{ghcdir}/%{pkgname}-%{version}/*.o
+%{_libdir}/%{ghcdir}/%{pkgname}-%{version}/*.so
 %{_libdir}/%{ghcdir}/%{pkgname}-%{version}/*.a
 %exclude %{_libdir}/%{ghcdir}/%{pkgname}-%{version}/*_p.a
 
+%{_libdir}/%{ghcdir}/%{pkgname}-%{version}/*.hi
+%{_libdir}/%{ghcdir}/%{pkgname}-%{version}/*.dyn_hi
 %dir %{_libdir}/%{ghcdir}/%{pkgname}-%{version}/System
 %{_libdir}/%{ghcdir}/%{pkgname}-%{version}/System/*.hi
+%{_libdir}/%{ghcdir}/%{pkgname}-%{version}/System/*.dyn_hi
 %dir %{_libdir}/%{ghcdir}/%{pkgname}-%{version}/System/Log
 %{_libdir}/%{ghcdir}/%{pkgname}-%{version}/System/Log/*.hi
+%{_libdir}/%{ghcdir}/%{pkgname}-%{version}/System/Log/*.dyn_hi
 %dir %{_libdir}/%{ghcdir}/%{pkgname}-%{version}/System/Log/Handler
 %{_libdir}/%{ghcdir}/%{pkgname}-%{version}/System/Log/Handler/*.hi
+%{_libdir}/%{ghcdir}/%{pkgname}-%{version}/System/Log/Handler/*.dyn_hi
 
+%if %{with prof}
 %files prof
 %defattr(644,root,root,755)
 %{_libdir}/%{ghcdir}/%{pkgname}-%{version}/*_p.a
+%{_libdir}/%{ghcdir}/%{pkgname}-%{version}/*.p_hi
 %{_libdir}/%{ghcdir}/%{pkgname}-%{version}/System/*.p_hi
 %{_libdir}/%{ghcdir}/%{pkgname}-%{version}/System/Log/*.p_hi
 %{_libdir}/%{ghcdir}/%{pkgname}-%{version}/System/Log/Handler/*.p_hi
+%endif
